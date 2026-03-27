@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>OrbitMeet · Connect Beyond Comfort</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .app-wrapper {
+            width: 1400px;
+            max-width: 100%;
+            height: 90vh;
+            min-height: 700px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,255,255,0.3);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .page {
+            width: 100%;
+            height: 100%;
+            display: none;
+            position: relative;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            margin: auto;
+            width: 450px;
+            max-width: 90%;
+            padding: 2rem;
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .auth-container h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .input-group input, .input-group textarea, .input-group select {
+            width: 100%;
+            padding: 14px 18px;
+            background: #f8f9ff;
+            border: 2px solid #e0e7ff;
+            border-radius: 1rem;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            padding: 14px;
+            border-radius: 1rem;
+            font-weight: bold;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            margin-top: 10px;
+        }
+
+        .error-msg {
+            color: #e74c3c;
+            font-size: 0.75rem;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .dashboard {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 40%, rgba(102,126,234,0.3), rgba(118,75,162,0.4));
+            overflow: hidden;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 1;
+        }
+
+        .side-panel {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            border-right: 2px solid #667eea;
+            z-index: 15;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            overflow-y: auto;
+            border-radius: 0 1.5rem 1.5rem 0;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+        }
+
+        .side-panel h3 {
+            color: #667eea;
+            font-size: 1.1rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .side-panel button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            padding: 10px;
+            border-radius: 1rem;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 4px 0;
+        }
+
+        .history-list, .messages-list {
+            background: #f8f9ff;
+            border-radius: 1rem;
+            padding: 0.5rem;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+        }
+
+        .history-item, .msg-item {
+            padding: 6px;
+            border-bottom: 1px solid #e0e7ff;
+            color: #4a5568;
+        }
+
+        .logout-top {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            z-index: 20;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 2rem;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .find-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 360px;
+            z-index: 20;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border: none;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+
+        .find-btn:active {
+            transform: scale(0.95);
+        }
+
+        .satellite-users {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .user-orbit {
+            position: absolute;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: 0.2s;
+            animation: float 3s infinite alternate;
+            z-index: 12;
+        }
+
+        .avatar-bubble {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .avatar-bubble img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            text-align: center;
+            font-size: 0.7rem;
+            background: rgba(0,0,0,0.7);
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-top: 5px;
+            color: white;
+            font-weight: 500;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-8px); }
+        }
+
+        .profile-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 320px;
+            background: white;
+            border-radius: 1.5rem;
+            z-index: 200;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: popIn 0.2s forwards;
+            overflow: hidden;
+        }
+
+        @keyframes popIn {
+            to { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 1.2rem;
+            text-align: center;
+        }
+
+        .profile-header img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            margin-top: 0.5rem;
+        }
+
+        .profile-info {
+            padding: 1.2rem;
+        }
+
+        .info-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 0.8rem;
+            padding: 6px 0;
+            border-bottom: 1px solid #e0e7ff;
+        }
+
+        .info-icon {
+            font-size: 1.2rem;
+            width: 32px;
+        }
+
+        .info-text {
+            flex: 1;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .info-text strong {
+            color: #667eea;
+            display: block;
+            font-size: 0.75rem;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 12px;
+            padding: 0 1.2rem 1.5rem;
+        }
+
+        .ring-btn, .ignore-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 2rem;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .ring-btn {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .ignore-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #2d3748;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 2rem;
+            z-index: 300;
+            font-weight: bold;
+            animation: fadeOut 2.5s forwards;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; }
+            100% { opacity: 0; display: none; }
+        }
+
+        .test-badge {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background: #fef5e7;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            text-align: center;
+            border: 1px solid #f093fb;
+        }
+
+        .test-badge span {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 15px;
+            margin: 2px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+<div class="app-wrapper" id="app">
+
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="page active">
+        <div class="auth-container">
+            <h2>🌍 OrbitMeet</h2>
+            <div class="input-group"><input type="text" id="loginUsername" placeholder="Username" autocomplete="username"></div>
+            <div class="input-group"><input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password"></div>
+            <button class="btn" id="loginBtn">🚀 Log In</button>
+            <button class="btn btn-outline" id="gotoRegisterBtn">📝 Create Account</button>
+            <div id="loginError" class="error-msg"></div>
+            <div class="test-badge">
+                🎯 <strong>Trial Account:</strong> <span>123tom</span> / <span>tom123</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- REGISTER PAGE -->
+    <div id="registerPage" class="page">
+        <div class="auth-container">
+            <h2>🌟 Join OrbitMeet</h2>
+            <div class="input-group"><input type="text" id="regUser" placeholder="Username"></div>
+            <div class="input-group"><input type="password" id="regPass" placeholder="Password"></div>
+            <div class="input-group"><input type="password" id="regConfirm" placeholder="Confirm Password"></div>
+            <div class="input-group"><input type="email" id="regEmail" placeholder="Email"></div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="termsCheck">
+                <label>I agree to the <strong>Terms & Agreements</strong> (connect respectfully)</label>
+            </div>
+            <button class="btn" id="registerBtn">✨ Register</button>
+            <div id="regError" class="error-msg"></div>
+        </div>
+    </div>
+
+    <!-- PROFILE INFO PAGE -->
+    <div id="profilePage" class="page">
+        <div class="auth-container" style="max-height: 80vh; overflow-y: auto;">
+            <h2>🌱 Tell Us About You</h2>
+            <div class="input-group"><input type="text" id="profileName" placeholder="Full Name"></div>
+            <div class="input-group"><input type="number" id="profileAge" placeholder="Age"></div>
+            <div class="input-group"><input type="text" id="profileHobbies" placeholder="Hobbies (comma separated)"></div>
+            <div class="input-group"><textarea id="profileBio" rows="2" placeholder="A short bio..."></textarea></div>
+            <div class="input-group"><input type="text" id="profilePicture" placeholder="Image URL (optional)"></div>
+            <button class="btn" id="saveProfileBtn">🚀 Launch into Orbit</button>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="mainPage" class="page">
+        <div class="dashboard">
+            <canvas id="satelliteCanvas"></canvas>
+            <div class="satellite-users" id="orbitUsers"></div>
+            
+            <!-- Left Side Panel -->
+            <div class="side-panel">
+                <h3>🪐 My Profile</h3>
+                <div id="profileSummary">Loading...</div>
+                <button id="editProfileBtn">✏️ Edit Profile</button>
+                <h3>📜 Ring History</h3>
+                <div id="historyList" class="history-list">✨ No rings yet</div>
+                <h3>💬 Messages</h3>
+                <div id="messagesList" class="messages-list">💌 No messages yet</div>
+            </div>
+            
+            <button id="findBtn" class="find-btn">🔍 FIND</button>
+            <button id="logoutBtn" class="logout-top">🚪 Log out</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize storage
+    let usersDB = JSON.parse(localStorage.getItem('orbitmeet_users')) || [];
+    let currentUser = null;
+    let ringHistory = JSON.parse(localStorage.getItem('orbitmeet_history')) || {};
+    let messagesDB = JSON.parse(localStorage.getItem('orbitmeet_messages')) || {};
+    let pendingRings = JSON.parse(localStorage.getItem('orbitmeet_pending')) || {};
+
+    function saveAll() {
+        localStorage.setItem('orbitmeet_users', JSON.stringify(usersDB));
+        localStorage.setItem('orbitmeet_history', JSON.stringify(ringHistory));
+        localStorage.setItem('orbitmeet_messages', JSON.stringify(messagesDB));
+        localStorage.setItem('orbitmeet_pending', JSON.stringify(pendingRings));
+    }
+
+    // Default users with trial account
+    function initUsers() {
+        const defaultUsers = [
+            { username: '123tom', password: 'tom123', email: 'tom@orbit.com', name: 'Tom Explorer', age: 26, hobbies: 'gaming, hiking, coding', bio: 'Looking for genuine connections! Let\'s step out together 🌟', picture: 'https://randomuser.me/api/portraits/men/32.jpg' },
+            { username: 'luna_moon', password: 'luna123', email: 'luna@orbit.com', name: 'Luna Chen', age: 24, hobbies: 'painting, yoga, poetry', bio: 'Quiet soul with a big heart. Coffee dates? ☕', picture: 'https://randomuser.me/api/portraits/women/68.jpg' },
+            { username: 'kai_waves', password: 'kai123', email: 'kai@orbit.com', name: 'Kai Rivers', age: 27, hobbies: 'photography, skateboarding, vinyl', bio: 'Let\'s vibe outside the comfort zone 🎶', picture: 'https://randomuser.me/api/portraits/men/45.jpg' },
+            { username: 'jade_soul', password: 'jade123', email: 'jade@orbit.com', name: 'Jade Solis', age: 23, hobbies: 'cafes, sketching, indie music', bio: 'Introvert but friendly. Let\'s connect!', picture: 'https://randomuser.me/api/portraits/women/44.jpg' },
+            { username: 'alex_spark', password: 'alex123', email: 'alex@orbit.com', name: 'Alex Spark', age: 25, hobbies: 'surfing, reading, hiking', bio: 'Adventure awaits! Let\'s explore together', picture: 'https://randomuser.me/api/portraits/men/52.jpg' }
+        ];
+        
+        for (let acc of defaultUsers) {
+            if (!usersDB.find(u => u.username === acc.username)) {
+                usersDB.push({
+                    username: acc.username,
+                    password: acc.password,
+                    email: acc.email,
+                    profile: { name: acc.name, age: acc.age, hobbies: acc.hobbies, bio: acc.bio, picture: acc.picture },
+                    completed: true
+                });
+            }
+        }
+        
+        usersDB.forEach(u => { if (!ringHistory[u.username]) ringHistory[u.username] = []; });
+        saveAll();
+    }
+    initUsers();
+
+    function updateSidebar() {
+        if (!currentUser) return;
+        const p = currentUser.profile;
+        document.getElementById('profileSummary').innerHTML = `
+            <strong style="color:#667eea;">${p.name}</strong><br>
+            ${p.age} yrs | ${p.hobbies?.split(',')[0] || '—'}<br>
+            <img src="${p.picture || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" style="width:50px; border-radius:50%; margin-top:5px;">
+        `;
+        
+        const history = ringHistory[currentUser.username] || [];
+        const historyDiv = document.getElementById('historyList');
+        if (history.length === 0) historyDiv.innerHTML = '✨ No rings yet';
+        else historyDiv.innerHTML = history.slice(0,8).map(h => `<div class="history-item">🔔 ${h.text}</div>`).join('');
+        
+        const messages = [];
+        for (let pair in messagesDB) {
+            if (pair.includes(currentUser.username)) {
+                const other = pair.replace(currentUser.username, '').replace('_', '');
+                const last = messagesDB[pair].slice(-1)[0];
+                if (last) messages.push(`💬 ${other}: ${last.text.substring(0, 30)}`);
+            }
+        }
+        const msgDiv = document.getElementById('messagesList');
+        if (messages.length === 0) msgDiv.innerHTML = '💌 No messages yet. Ring someone!';
+        else msgDiv.innerHTML = messages.slice(-5).map(m => `<div class="msg-item">${m}</div>`).join('');
+    }
+
+    function showProfileCard(user) {
+        const p = user.profile;
+        const modal = document.createElement('div');
+        modal.className = 'profile-card';
+        modal.innerHTML = `
+            <div class="profile-header">
+                <img src="${p.picture || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                <div class="profile-name">${escapeHtml(p.name)}</div>
+            </div>
+            <div class="profile-info">
+                <div class="info-row"><span class="info-icon">🎂</span><div class="info-text"><strong>Age</strong>${p.age} years</div></div>
+                <div class="info-row"><span class="info-icon">🎯</span><div class="info-text"><strong>Hobbies</strong>${p.hobbies || 'Exploring'}</div></div>
+                <div class="info-row"><span class="info-icon">📖</span><div class="info-text"><strong>Bio</strong>${p.bio || 'Ready to connect!'}</div></div>
+            </div>
+            <div class="profile-actions">
+                <button class="ignore-btn" data-action="ignore">🚫 Ignore</button>
+                <button class="ring-btn" data-action="ring">🔔 Ring</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        modal.querySelector('[data-action="ring"]').onclick = () => {
+            ringUser(user.username);
+            modal.remove();
+        };
+        modal.querySelector('[data-action="ignore"]').onclick = () => {
+            showToast(`👻 You ignored ${p.name}`);
+            modal.remove();
+        };
+        
+        setTimeout(() => {
+            document.addEventListener('click', function close(e) {
+                if (!modal.contains(e.target)) { modal.remove(); document.removeEventListener('click', close); }
+            });
+        }, 10);
+    }
+
+    function ringUser(targetUser) {
+        if (!currentUser || targetUser === currentUser.username) return;
+        
+        if (navigator.vibrate) navigator.vibrate(200);
+        showToast(`🔔 Ringing ${targetUser}...`);
+        
+        const time = new Date().toLocaleTimeString();
+        ringHistory[currentUser.username].unshift({ text: `You rang ${targetUser} at ${time}`, rangBack: false });
+        
+        if (!pendingRings[targetUser]) pendingRings[targetUser] = [];
+        pendingRings[targetUser].push({ from: currentUser.username, time: Date.now() });
+        saveAll();
+        updateSidebar();
+        checkIncomingRings();
+        showToast(`💛 ${targetUser} can ring you back to reveal location!`);
+    }
+
+    function checkIncomingRings() {
+        if (!currentUser) return;
+        const myPending = pendingRings[currentUser.username] || [];
+        if (myPending.length === 0) return;
+        
+        myPending.forEach(req => {
+            const fromUser = req.from;
+            const modal = document.createElement('div');
+            modal.className = 'profile-card';
+            modal.innerHTML = `
+                <div class="profile-header" style="background:linear-gradient(135deg,#f093fb,#f5576c)">
+                    <div style="font-size:3rem;">🔔</div>
+                    <div class="profile-name" style="font-size:1.2rem;">Incoming Ring!</div>
+                </div>
+                <div class="profile-info">
+                    <p style="text-align:center; font-size:1.1rem;">✨ <strong>${escapeHtml(fromUser)}</strong> wants to connect ✨</p>
+                    <p style="text-align:center; margin-top:10px;">Ring back to reveal location and start messaging!</p>
+                </div>
+                <div class="profile-actions">
+                    <button id="ringBackBtn" class="ring-btn">💞 RING BACK</button>
+                    <button id="ignoreRingBtn" class="ignore-btn">Ignore</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            document.getElementById('ringBackBtn')?.addEventListener('click', () => {
+                if (navigator.vibrate) navigator.vibrate(300);
+                const timeBack = new Date().toLocaleTimeString();
+                ringHistory[currentUser.username].unshift({ text: `${fromUser} rang you back at ${timeBack} 💞`, rangBack: true });
+                
+                const senderHistory = ringHistory[fromUser] || [];
+                const sentEntry = senderHistory.find(h => h.text.includes(`You rang ${currentUser.username}`));
+                if (sentEntry) sentEntry.rangBack = true;
+                
+                // Create message thread
+                const threadId = [currentUser.username, fromUser].sort().join('_');
+                if (!messagesDB[threadId]) messagesDB[threadId] = [];
+                messagesDB[threadId].push({ sender: 'system', text: `📍 LOCATION REVEALED! You are now connected with ${fromUser}. Start messaging!`, time: Date.now() });
+                
+                saveAll();
+                showToast(`📍 LOCATION REVEALED! You can now message ${fromUser}`);
+                modal.remove();
+                updateSidebar();
+                
+                pendingRings[currentUser.username] = pendingRings[currentUser.username].filter(r => r.from !== fromUser);
+                saveAll();
+            });
+            
+            document.getElementById('ignoreRingBtn')?.addEventListener('click', () => {
+                modal.remove();
+                pendingRings[currentUser.username] = pendingRings[currentUser.username].filter(r => r.from !== fromUser);
+                saveAll();
+                showToast(`You ignored ${fromUser}`);
+            });
+        });
+        pendingRings[currentUser.username] = [];
+        saveAll();
+    }
+
+    function findNearbyUsers() {
+        if (!currentUser) return;
+        const others = usersDB.filter(u => u.username !== currentUser.username && u.completed === true);
+        const container = document.getElementById('orbitUsers');
+        container.innerHTML = '';
+        
+        if (others.length === 0) {
+            container.innerHTML = '<div style="color:white; position:absolute; top:40%; left:40%; background:rgba(0,0,0,0.6); padding:12px 20px; border-radius:30px;">✨ No signals yet ✨</div>';
+            return;
+        }
+        
+        const angles = [0, 60, 120, 180, 240, 300, 30, 90, 150, 210, 270];
+        const rect = container.parentElement?.getBoundingClientRect() || { width: window.innerWidth, height: window.innerHeight };
+        const centerX = (rect.width || window.innerWidth) * 0.5;
+        const centerY = (rect.height || window.innerHeight) * 0.45;
+        
+        others.forEach((user, idx) => {
+            const angle = (angles[idx % angles.length] * Math.PI) / 180;
+            const radius = 150 + (idx % 3) * 35;
+            let left = centerX + Math.cos(angle) * radius - 35;
+            let top = centerY + Math.sin(angle + idx) * (radius * 0.6) - 35;
+            left = Math.min(Math.max(left, 30), (rect.width || window.innerWidth) - 90);
+            top = Math.min(Math.max(top, 50), (rect.height || window.innerHeight) - 120);
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'user-orbit';
+            bubble.style.left = `${left}px`;
+            bubble.style.top = `${top}px`;
+            bubble.innerHTML = `
+                <div class="avatar-bubble"><img src="${user.profile?.picture || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'"></div>
+                <div class="user-name">${escapeHtml(user.profile?.name?.split(' ')[0] || user.username)}</div>
+            `;
+            bubble.addEventListener('click', () => showProfileCard(user));
+            container.appendChild(bubble);
+        });
+        showToast(`🌍 ${others.length} user(s) detected! Click their avatar to view profile.`);
+    }
+
+    function initSatellite() {
+        const canvas = document.getElementById('satelliteCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let angle = 0;
+        
+        function resize() { width = canvas.parentElement.clientWidth; height = canvas.parentElement.clientHeight; canvas.width = width; canvas.height = height; }
+        window.addEventListener('resize', resize);
+        
+        function draw() {
+            if (!canvas.isConnected) return;
+            resize();
+            ctx.clearRect(0, 0, width, height);
+            
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.arc(width * 0.5, height * 0.45, 120 + i * 45, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            let satX = width * 0.5 + Math.cos(angle) * 150;
+            let satY = height * 0.45 + Math.sin(angle * 1.2) * 100;
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(satX, satY, 22, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#667eea';
+            ctx.font = "bold 26px monospace";
+            ctx.fillText("🛰️", satX - 15, satY + 10);
+            angle += 0.008;
+            requestAnimationFrame(draw);
+        }
+        draw();
+    }
+
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+    function showToast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2500); }
+
+    // Login with Enter key
+    document.getElementById('loginPassword').addEventListener('keypress', (e) => { if (e.key === 'Enter') doLogin(); });
+    document.getElementById('loginBtn').onclick = doLogin;
+    
+    function doLogin() {
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const user = usersDB.find(u => u.username === username && u.password === password);
+        if (!user) { document.getElementById('loginError').innerText = '❌ Invalid credentials. Try: 123tom / tom123'; return; }
+        if (!user.completed) {
+            currentUser = user;
+            document.getElementById('loginPage').classList.remove('active');
+            document.getElementById('profilePage').classList.add('active');
+            return;
+        }
+        currentUser = user;
+        goToMain();
+    }
+    
+    document.getElementById('gotoRegisterBtn').onclick = () => {
+        document.getElementById('loginPage').classList.remove('active');
+        document.getElementById('registerPage').classList.add('active');
+    };
+    
+    document.getElementById('registerBtn').onclick = () => {
+        const u = document.getElementById('regUser').value.trim();
+        const p = document.getElementById('regPass').value;
+        const c = document.getElementById('regConfirm').value;
+        const e = document.getElementById('regEmail').value.trim();
+        const terms = document.getElementById('termsCheck').checked;
+        if (!u || !p || !c || !e) { document.getElementById('regError').innerText = 'All fields required'; return; }
+        if (p !== c) { document.getElementById('regError').innerText = 'Passwords do not match'; return; }
+        if (!terms) { document.getElementById('regError').innerText = 'You must agree to Terms & Agreements'; return; }
+        if (usersDB.find(ex => ex.username === u)) { document.getElementById('regError').innerText = 'Username already exists'; return; }
+        const newUser = { username: u, password: p, email: e, completed: false, profile: null };
+        usersDB.push(newUser);
+        saveAll();
+        currentUser = newUser;
+        document.getElementById('registerPage').classList.remove('active');
+        document.getElementById('profilePage').classList.add('active');
+    };
+    
+    document.getElementById('saveProfileBtn').onclick = () => {
+        const name = document.getElementById('profileName').value.trim();
+        const age = parseInt(document.getElementById('profileAge').value);
+        const hobbies = document.getElementById('profileHobbies').value.trim();
+        const bio = document.getElementById('profileBio').value.trim();
+        const picture = document.getElementById('profilePicture').value.trim();
+        if (!name || !age || !hobbies) { alert('Please fill name, age and hobbies'); return; }
+        currentUser.profile = { name, age, hobbies, bio: bio || 'Ready to connect!', picture: picture || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' };
+        currentUser.completed = true;
+        const idx = usersDB.findIndex(u => u.username === currentUser.username);
+        if (idx !== -1) usersDB[idx] = currentUser;
+        saveAll();
+        goToMain();
+    };
+    
+    function goToMain() {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('mainPage').classList.add('active');
+        initSatellite();
+        updateSidebar();
+        setInterval(() => { if (currentUser) checkIncomingRings(); }, 3000);
+        checkIncomingRings();
+        
+        document.getElementById('findBtn').onclick = findNearbyUsers;
+        document.getElementById('logoutBtn').onclick = () => { currentUser = null; location.reload(); };
+        document.getElementById('editProfileBtn').onclick = () => {
+            const newName = prompt('New name', currentUser.profile.name);
+            if (newName) currentUser.profile.name = newName;
+            const newHobby = prompt('Hobbies', currentUser.profile.hobbies);
+            if (newHobby) currentUser.profile.hobbies = newHobby;
+            const idx = usersDB.findIndex(u => u.username === currentUser.username);
+            if (idx !== -1) usersDB[idx] = currentUser;
+            saveAll();
+            updateSidebar();
+            showToast('Profile updated!');
+        };
+    }
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>OrbitMeet · Connect Beyond Comfort</title>
+    <title>LocalLynk · Connect Beyond Comfort</title>
     <style>
         * {
             margin: 0;
@@ -426,22 +426,19 @@
     <!-- LOGIN PAGE -->
     <div id="loginPage" class="page active">
         <div class="auth-container">
-            <h2>🌍 OrbitMeet</h2>
+            <h2>LocalLynk</h2>
             <div class="input-group"><input type="text" id="loginUsername" placeholder="Username" autocomplete="username"></div>
             <div class="input-group"><input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password"></div>
-            <button class="btn" id="loginBtn">🚀 Log In</button>
-            <button class="btn btn-outline" id="gotoRegisterBtn">📝 Create Account</button>
+            <button class="btn" id="loginBtn">Log In</button>
+            <button class="btn btn-outline" id="gotoRegisterBtn">Create Account</button>
             <div id="loginError" class="error-msg"></div>
-            <div class="test-badge">
-                🎯 <strong>Trial Account:</strong> <span>123tom</span> / <span>tom123</span>
-            </div>
         </div>
     </div>
 
     <!-- REGISTER PAGE -->
     <div id="registerPage" class="page">
         <div class="auth-container">
-            <h2>🌟 Join OrbitMeet</h2>
+            <h2>Join LocalLynk</h2>
             <div class="input-group"><input type="text" id="regUser" placeholder="Username"></div>
             <div class="input-group"><input type="password" id="regPass" placeholder="Password"></div>
             <div class="input-group"><input type="password" id="regConfirm" placeholder="Confirm Password"></div>
@@ -450,7 +447,8 @@
                 <input type="checkbox" id="termsCheck">
                 <label>I agree to the <strong>Terms & Agreements</strong> (connect respectfully)</label>
             </div>
-            <button class="btn" id="registerBtn">✨ Register</button>
+            <button class="btn btn-outline" id="backToLoginBtn">← Back to Login</button>
+            <button class="btn" id="registerBtn">Register</button>
             <div id="regError" class="error-msg"></div>
         </div>
     </div>
@@ -458,13 +456,14 @@
     <!-- PROFILE INFO PAGE -->
     <div id="profilePage" class="page">
         <div class="auth-container" style="max-height: 80vh; overflow-y: auto;">
-            <h2>🌱 Tell Us About You</h2>
+            <h2>Tell Us About You</h2>
             <div class="input-group"><input type="text" id="profileName" placeholder="Full Name"></div>
             <div class="input-group"><input type="number" id="profileAge" placeholder="Age"></div>
             <div class="input-group"><input type="text" id="profileHobbies" placeholder="Hobbies (comma separated)"></div>
             <div class="input-group"><textarea id="profileBio" rows="2" placeholder="A short bio..."></textarea></div>
-            <div class="input-group"><input type="text" id="profilePicture" placeholder="Image URL (optional)"></div>
-            <button class="btn" id="saveProfileBtn">🚀 Launch into Orbit</button>
+            <div class="input-group"><input type="file" id="profilePicture" accept="image/*" placeholder="Select Profile Picture"></div>
+            <button class="btn btn-outline" id="backToRegisterBtn">← Back to Register</button>
+            <button class="btn" id="saveProfileBtn">Launch into Orbit</button>
         </div>
     </div>
 
@@ -476,42 +475,42 @@
             
             <!-- Left Side Panel -->
             <div class="side-panel">
-                <h3>🪐 My Profile</h3>
+                <h3>My Profile</h3>
                 <div id="profileSummary">Loading...</div>
-                <button id="editProfileBtn">✏️ Edit Profile</button>
-                <h3>📜 Ring History</h3>
-                <div id="historyList" class="history-list">✨ No rings yet</div>
-                <h3>💬 Messages</h3>
-                <div id="messagesList" class="messages-list">💌 No messages yet</div>
+                <button id="editProfileBtn">Edit Profile</button>
+                <h3>Ring History</h3>
+                <div id="historyList" class="history-list">No rings yet</div>
+                <h3>Messages</h3>
+                <div id="messagesList" class="messages-list">No messages yet</div>
             </div>
             
-            <button id="findBtn" class="find-btn">🔍 FIND</button>
-            <button id="logoutBtn" class="logout-top">🚪 Log out</button>
+            <button id="findBtn" class="find-btn">FIND</button>
+            <button id="logoutBtn" class="logout-top">Log out</button>
         </div>
     </div>
 </div>
 
 <script>
     // Initialize storage
-    let usersDB = JSON.parse(localStorage.getItem('orbitmeet_users')) || [];
+    let usersDB = JSON.parse(localStorage.getItem('locallynk_users')) || [];
     let currentUser = null;
-    let ringHistory = JSON.parse(localStorage.getItem('orbitmeet_history')) || {};
-    let messagesDB = JSON.parse(localStorage.getItem('orbitmeet_messages')) || {};
-    let pendingRings = JSON.parse(localStorage.getItem('orbitmeet_pending')) || {};
+    let ringHistory = JSON.parse(localStorage.getItem('locallynk_history')) || {};
+    let messagesDB = JSON.parse(localStorage.getItem('locallynk_messages')) || {};
+    let pendingRings = JSON.parse(localStorage.getItem('locallynk_pending')) || {};
 
     function saveAll() {
-        localStorage.setItem('orbitmeet_users', JSON.stringify(usersDB));
-        localStorage.setItem('orbitmeet_history', JSON.stringify(ringHistory));
-        localStorage.setItem('orbitmeet_messages', JSON.stringify(messagesDB));
-        localStorage.setItem('orbitmeet_pending', JSON.stringify(pendingRings));
+        localStorage.setItem('locallynk_users', JSON.stringify(usersDB));
+        localStorage.setItem('locallynk_history', JSON.stringify(ringHistory));
+        localStorage.setItem('locallynk_messages', JSON.stringify(messagesDB));
+        localStorage.setItem('locallynk_pending', JSON.stringify(pendingRings));
     }
 
     // Default users with trial account
     function initUsers() {
         const defaultUsers = [
-            { username: '123tom', password: 'tom123', email: 'tom@orbit.com', name: 'Tom Explorer', age: 26, hobbies: 'gaming, hiking, coding', bio: 'Looking for genuine connections! Let\'s step out together 🌟', picture: 'https://randomuser.me/api/portraits/men/32.jpg' },
-            { username: 'luna_moon', password: 'luna123', email: 'luna@orbit.com', name: 'Luna Chen', age: 24, hobbies: 'painting, yoga, poetry', bio: 'Quiet soul with a big heart. Coffee dates? ☕', picture: 'https://randomuser.me/api/portraits/women/68.jpg' },
-            { username: 'kai_waves', password: 'kai123', email: 'kai@orbit.com', name: 'Kai Rivers', age: 27, hobbies: 'photography, skateboarding, vinyl', bio: 'Let\'s vibe outside the comfort zone 🎶', picture: 'https://randomuser.me/api/portraits/men/45.jpg' },
+            { username: '123tom', password: 'tom123', email: 'tom@orbit.com', name: 'Tom Explorer', age: 26, hobbies: 'gaming, hiking, coding', bio: 'Looking for genuine connections! Let\'s step out together', picture: 'https://randomuser.me/api/portraits/men/32.jpg' },
+            { username: 'luna_moon', password: 'luna123', email: 'luna@orbit.com', name: 'Luna Chen', age: 24, hobbies: 'painting, yoga, poetry', bio: 'Quiet soul with a big heart. Coffee dates?', picture: 'https://randomuser.me/api/portraits/women/68.jpg' },
+            { username: 'kai_waves', password: 'kai123', email: 'kai@orbit.com', name: 'Kai Rivers', age: 27, hobbies: 'photography, skateboarding, vinyl', bio: 'Let\'s vibe outside the comfort zone', picture: 'https://randomuser.me/api/portraits/men/45.jpg' },
             { username: 'jade_soul', password: 'jade123', email: 'jade@orbit.com', name: 'Jade Solis', age: 23, hobbies: 'cafes, sketching, indie music', bio: 'Introvert but friendly. Let\'s connect!', picture: 'https://randomuser.me/api/portraits/women/44.jpg' },
             { username: 'alex_spark', password: 'alex123', email: 'alex@orbit.com', name: 'Alex Spark', age: 25, hobbies: 'surfing, reading, hiking', bio: 'Adventure awaits! Let\'s explore together', picture: 'https://randomuser.me/api/portraits/men/52.jpg' }
         ];
@@ -544,19 +543,19 @@
         
         const history = ringHistory[currentUser.username] || [];
         const historyDiv = document.getElementById('historyList');
-        if (history.length === 0) historyDiv.innerHTML = '✨ No rings yet';
-        else historyDiv.innerHTML = history.slice(0,8).map(h => `<div class="history-item">🔔 ${h.text}</div>`).join('');
+        if (history.length === 0) historyDiv.innerHTML = 'No rings yet';
+        else historyDiv.innerHTML = history.slice(0,8).map(h => `<div class="history-item">${h.text}</div>`).join('');
         
         const messages = [];
         for (let pair in messagesDB) {
             if (pair.includes(currentUser.username)) {
                 const other = pair.replace(currentUser.username, '').replace('_', '');
                 const last = messagesDB[pair].slice(-1)[0];
-                if (last) messages.push(`💬 ${other}: ${last.text.substring(0, 30)}`);
+                if (last) messages.push(`${other}: ${last.text.substring(0, 30)}`);
             }
         }
         const msgDiv = document.getElementById('messagesList');
-        if (messages.length === 0) msgDiv.innerHTML = '💌 No messages yet. Ring someone!';
+        if (messages.length === 0) msgDiv.innerHTML = 'No messages yet. Ring someone!';
         else msgDiv.innerHTML = messages.slice(-5).map(m => `<div class="msg-item">${m}</div>`).join('');
     }
 
@@ -570,13 +569,13 @@
                 <div class="profile-name">${escapeHtml(p.name)}</div>
             </div>
             <div class="profile-info">
-                <div class="info-row"><span class="info-icon">🎂</span><div class="info-text"><strong>Age</strong>${p.age} years</div></div>
-                <div class="info-row"><span class="info-icon">🎯</span><div class="info-text"><strong>Hobbies</strong>${p.hobbies || 'Exploring'}</div></div>
-                <div class="info-row"><span class="info-icon">📖</span><div class="info-text"><strong>Bio</strong>${p.bio || 'Ready to connect!'}</div></div>
+                <div class="info-row"><span class="info-icon"></span><div class="info-text"><strong>Age</strong>${p.age} years</div></div>
+                <div class="info-row"><span class="info-icon"></span><div class="info-text"><strong>Hobbies</strong>${p.hobbies || 'Exploring'}</div></div>
+                <div class="info-row"><span class="info-icon"></span><div class="info-text"><strong>Bio</strong>${p.bio || 'Ready to connect!'}</div></div>
             </div>
             <div class="profile-actions">
-                <button class="ignore-btn" data-action="ignore">🚫 Ignore</button>
-                <button class="ring-btn" data-action="ring">🔔 Ring</button>
+                <button class="ignore-btn" data-action="ignore">Ignore</button>
+                <button class="ring-btn" data-action="ring">Ring</button>
             </div>
         `;
         document.body.appendChild(modal);
@@ -586,7 +585,7 @@
             modal.remove();
         };
         modal.querySelector('[data-action="ignore"]').onclick = () => {
-            showToast(`👻 You ignored ${p.name}`);
+            showToast(`You ignored ${p.name}`);
             modal.remove();
         };
         
@@ -601,7 +600,7 @@
         if (!currentUser || targetUser === currentUser.username) return;
         
         if (navigator.vibrate) navigator.vibrate(200);
-        showToast(`🔔 Ringing ${targetUser}...`);
+        showToast(`Ringing ${targetUser}...`);
         
         const time = new Date().toLocaleTimeString();
         ringHistory[currentUser.username].unshift({ text: `You rang ${targetUser} at ${time}`, rangBack: false });
@@ -611,7 +610,7 @@
         saveAll();
         updateSidebar();
         checkIncomingRings();
-        showToast(`💛 ${targetUser} can ring you back to reveal location!`);
+        showToast(`${targetUser} can ring you back to reveal location!`);
     }
 
     function checkIncomingRings() {
@@ -625,15 +624,15 @@
             modal.className = 'profile-card';
             modal.innerHTML = `
                 <div class="profile-header" style="background:linear-gradient(135deg,#f093fb,#f5576c)">
-                    <div style="font-size:3rem;">🔔</div>
+                    <div style="font-size:3rem;"></div>
                     <div class="profile-name" style="font-size:1.2rem;">Incoming Ring!</div>
                 </div>
                 <div class="profile-info">
-                    <p style="text-align:center; font-size:1.1rem;">✨ <strong>${escapeHtml(fromUser)}</strong> wants to connect ✨</p>
+                    <p style="text-align:center; font-size:1.1rem;"><strong>${escapeHtml(fromUser)}</strong> wants to connect</p>
                     <p style="text-align:center; margin-top:10px;">Ring back to reveal location and start messaging!</p>
                 </div>
                 <div class="profile-actions">
-                    <button id="ringBackBtn" class="ring-btn">💞 RING BACK</button>
+                    <button id="ringBackBtn" class="ring-btn">RING BACK</button>
                     <button id="ignoreRingBtn" class="ignore-btn">Ignore</button>
                 </div>
             `;
@@ -642,7 +641,7 @@
             document.getElementById('ringBackBtn')?.addEventListener('click', () => {
                 if (navigator.vibrate) navigator.vibrate(300);
                 const timeBack = new Date().toLocaleTimeString();
-                ringHistory[currentUser.username].unshift({ text: `${fromUser} rang you back at ${timeBack} 💞`, rangBack: true });
+                ringHistory[currentUser.username].unshift({ text: `${fromUser} rang you back at ${timeBack}`, rangBack: true });
                 
                 const senderHistory = ringHistory[fromUser] || [];
                 const sentEntry = senderHistory.find(h => h.text.includes(`You rang ${currentUser.username}`));
@@ -651,10 +650,10 @@
                 // Create message thread
                 const threadId = [currentUser.username, fromUser].sort().join('_');
                 if (!messagesDB[threadId]) messagesDB[threadId] = [];
-                messagesDB[threadId].push({ sender: 'system', text: `📍 LOCATION REVEALED! You are now connected with ${fromUser}. Start messaging!`, time: Date.now() });
+                messagesDB[threadId].push({ sender: 'system', text: `LOCATION REVEALED! You are now connected with ${fromUser}. Start messaging!`, time: Date.now() });
                 
                 saveAll();
-                showToast(`📍 LOCATION REVEALED! You can now message ${fromUser}`);
+                showToast(`LOCATION REVEALED! You can now message ${fromUser}`);
                 modal.remove();
                 updateSidebar();
                 
@@ -680,7 +679,7 @@
         container.innerHTML = '';
         
         if (others.length === 0) {
-            container.innerHTML = '<div style="color:white; position:absolute; top:40%; left:40%; background:rgba(0,0,0,0.6); padding:12px 20px; border-radius:30px;">✨ No signals yet ✨</div>';
+            container.innerHTML = '<div style="color:white; position:absolute; top:40%; left:40%; background:rgba(0,0,0,0.6); padding:12px 20px; border-radius:30px;">No signals yet</div>';
             return;
         }
         
@@ -708,7 +707,7 @@
             bubble.addEventListener('click', () => showProfileCard(user));
             container.appendChild(bubble);
         });
-        showToast(`🌍 ${others.length} user(s) detected! Click their avatar to view profile.`);
+        showToast(`${others.length} user(s) detected! Click their avatar to view profile.`);
     }
 
     function initSatellite() {
@@ -743,7 +742,7 @@
             ctx.fill();
             ctx.fillStyle = '#667eea';
             ctx.font = "bold 26px monospace";
-            ctx.fillText("🛰️", satX - 15, satY + 10);
+            ctx.fillText("SAT", satX - 15, satY + 10);
             angle += 0.008;
             requestAnimationFrame(draw);
         }
@@ -761,7 +760,7 @@
         const username = document.getElementById('loginUsername').value.trim();
         const password = document.getElementById('loginPassword').value;
         const user = usersDB.find(u => u.username === username && u.password === password);
-        if (!user) { document.getElementById('loginError').innerText = '❌ Invalid credentials. Try: 123tom / tom123'; return; }
+        if (!user) { document.getElementById('loginError').innerText = 'Invalid credentials. Try: 123tom / tom123'; return; }
         if (!user.completed) {
             currentUser = user;
             document.getElementById('loginPage').classList.remove('active');
@@ -775,6 +774,11 @@
     document.getElementById('gotoRegisterBtn').onclick = () => {
         document.getElementById('loginPage').classList.remove('active');
         document.getElementById('registerPage').classList.add('active');
+    };
+    
+    document.getElementById('backToLoginBtn').onclick = () => {
+        document.getElementById('registerPage').classList.remove('active');
+        document.getElementById('loginPage').classList.add('active');
     };
     
     document.getElementById('registerBtn').onclick = () => {
@@ -800,14 +804,36 @@
         const age = parseInt(document.getElementById('profileAge').value);
         const hobbies = document.getElementById('profileHobbies').value.trim();
         const bio = document.getElementById('profileBio').value.trim();
-        const picture = document.getElementById('profilePicture').value.trim();
+        const pictureInput = document.getElementById('profilePicture');
+        
         if (!name || !age || !hobbies) { alert('Please fill name, age and hobbies'); return; }
-        currentUser.profile = { name, age, hobbies, bio: bio || 'Ready to connect!', picture: picture || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' };
+        
+        // Handle file upload
+        if (pictureInput.files && pictureInput.files[0]) {
+            const file = pictureInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const pictureData = e.target.result;
+                saveProfile(name, age, hobbies, bio, pictureData);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            saveProfile(name, age, hobbies, bio, 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png');
+        }
+    };
+    
+    function saveProfile(name, age, hobbies, bio, picture) {
+        currentUser.profile = { name, age, hobbies, bio: bio || 'Ready to connect!', picture };
         currentUser.completed = true;
         const idx = usersDB.findIndex(u => u.username === currentUser.username);
         if (idx !== -1) usersDB[idx] = currentUser;
         saveAll();
         goToMain();
+    };
+    
+    document.getElementById('backToRegisterBtn').onclick = () => {
+        document.getElementById('profilePage').classList.remove('active');
+        document.getElementById('registerPage').classList.add('active');
     };
     
     function goToMain() {
